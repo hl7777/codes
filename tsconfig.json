@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "outDir": "../dist/",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+	"sourceMap": true,
+    "lib": [
+      "es2016",
+      "dom"
+    ],
+	"target": "es5",
+    "moduleResolution": "node",
+	"types": [
+            "node"
+         ],
+         "typeRoots": [
+            "../node_modules/@types"
+         ]
+  },
+
+  "filesGlob": [
+        "**/*.ts",
+        "**/*.tsx",
+        "!node_modules/**"
+    ]
+}
