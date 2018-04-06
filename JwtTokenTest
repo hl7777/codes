@@ -1,0 +1,57 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Security.Cryptography;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+
+namespace JwtToken.UnitTest
+{
+    [TestClass]
+    public class TokenTests
+    {
+        [TestMethod]
+        public void TokenTest()
+        {
+            //var hma = new HMACSHA256();
+            //var secret = Convert.ToBase64String(hma.Key);
+            ////OR
+            //byte[] bytes = Encoding.UTF8.GetBytes("very long string");
+            //var secret = Convert.ToBase64String(bytes);
+
+            var secret = "zZb2XvHBHanwiHEHuMVWTCkdxJ3IPOOveehDS9qRnRby2OSqdlT7D+YyNkiYsRa+5iBSb6yIN6P6m2jbRQun8w==";
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+
+            var credential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+
+            var handle = new JwtSecurityTokenHandler();
+
+            var descriptor = new SecurityTokenDescriptor()
+            {
+                SigningCredentials = credential,
+                Expires = DateTime.Now.AddMinutes(30),
+                Subject = new ClaimsIdentity(new List<Claim>(){
+                    new Claim(ClaimTypes.Name,"user"),
+                    new Claim(ClaimTypes.Role,"Admin")
+                })
+            };
+
+            var token = handle.CreateToken(descriptor);
+
+            string strToken = handle.WriteToken(token);
+
+            var readToken = handle.ReadJwtToken(strToken);
+
+            string nameValue = "";
+            handle.OutboundClaimTypeMap.TryGetValue(ClaimTypes.Name, out nameValue);
+
+            var claims = readToken.Claims.FirstOrDefault(x => x.Type == nameValue);
+
+            Assert.AreEqual("user", claims.Value);
+        }
+    }
+}
